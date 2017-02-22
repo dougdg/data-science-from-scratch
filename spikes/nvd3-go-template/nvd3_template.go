@@ -48,8 +48,15 @@ func deleteDirOutput() {
 		os.Remove("output")
 }
 
+func createDirOutput(path string) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+    os.Mkdir(path, os.ModePerm)
+	}
+}
+
 func main() {
 	deleteDirOutput()
+	createDirOutput("output")
 
 	path := "output/" + os.Args[1]
 	render(path)
