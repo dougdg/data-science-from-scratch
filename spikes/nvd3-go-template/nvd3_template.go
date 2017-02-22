@@ -7,32 +7,59 @@ import (
 	"github.com/go-template/nvd3-go-template/browser"
 )
 
-var t *template.Template
-type Data_type struct {
+var lineChartTemplate *template.Template
+var barChartTemplate *template.Template
+
+type Line_type struct {
 	X	int
 	Y	float64
 }
 
-var data []Data_type
+type Bar_type struct {
+	Label string
+	Value float64
+}
+
+var data []Line_type
+var data_bar []Bar_type
 
 func init() {
-	t = template.Must(template.ParseFiles("templates/linechart.html",
+	lineChartTemplate = template.Must(template.ParseFiles("templates/linechart.html",
 		"templates/linechartjs.tmpl"))
-	data = []Data_type {
-		Data_type {X: 1950, Y: 300.2},
-		Data_type {X: 1950, Y: 300.2},
-		Data_type {X: 1960, Y: 543.3},
-		Data_type {X: 1970, Y: 1075.9},
-		Data_type {X: 1980, Y: 2862.5},
-		Data_type {X: 1990, Y: 5979.6},
-		Data_type {X: 2000, Y: 10289.7},
-		Data_type {X: 2010, Y: 14958.3},
+	barChartTemplate = template.Must(template.ParseFiles("templates/discreteBarChart.html",
+		"templates/discreteBarChart.tmpl"))
+
+
+	data = []Line_type {
+		Line_type {X: 1950, Y: 300.2},
+		Line_type {X: 1950, Y: 300.2},
+		Line_type {X: 1960, Y: 543.3},
+		Line_type {X: 1970, Y: 1075.9},
+		Line_type {X: 1980, Y: 2862.5},
+		Line_type {X: 1990, Y: 5979.6},
+		Line_type {X: 2000, Y: 10289.7},
+		Line_type {X: 2010, Y: 14958.3},
+	}
+
+	data_bar = []Bar_type {
+		Bar_type {Label: "Annie Hall", Value: 5},
+		Bar_type {Label: "Ben-Hur", Value: 11},
+		Bar_type {Label: "Casablanca", Value: 3},
+		Bar_type {Label: "Gandhi", Value: 8},
+		Bar_type {Label: "West Side Story", Value: 10},
 	}
 }
 
-func render(path string) {
+func renderLineChart(path string) {
 	var file = createFile(path)
-	t.ExecuteTemplate(file, "linechart.html", data)
+	lineChartTemplate.ExecuteTemplate(file, "linechart.html", data)
+	defer file.Close()
+}
+
+func renderBarChart(path string) {
+	var file = createFile(path)
+	barChartTemplate.ExecuteTemplate(file, "discreteBarChart.html",
+	 data_bar)
 	defer file.Close()
 }
 
@@ -58,7 +85,14 @@ func main() {
 	deleteDirOutput()
 	createDirOutput("output")
 
-	path := "output/" + os.Args[1]
-	render(path)
+	chartType := os.Args[1]
+	path := "output/" + chartType
+
+	if (chartType == "linechart") {
+			renderLineChart(path)
+	} else {
+			renderBarChart(path)
+	}
+
 	browser.Open(path)
 }

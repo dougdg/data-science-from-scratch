@@ -1,0 +1,44 @@
+<script>
+
+    var values = [];
+    {{range .}}
+      values.push({ "label": {{.Label}}, "value": {{.Value}} });
+    {{end}}
+    var historicalBarChart = [
+      {
+        key: "Cumulative",
+        values: values
+      }
+    ];
+
+    nv.addGraph(function() {
+        var chart = nv.models.discreteBarChart()
+            .x(function(d) { return d.label })
+            .y(function(d) { return d.value })
+            .color(function() {return "blue"})
+            .staggerLabels(true)
+            .showValues(true)
+            .duration(250)
+            ;
+
+        chart.yAxis
+             .axisLabel('# of Academy Awards');
+        chart.showXAxis(true);
+
+        d3.select('#chart1 svg')
+            .datum(historicalBarChart)
+            .call(chart);
+
+        d3.select('#chart1 svg')
+          .append("text")
+          .attr("x", 662)
+          .attr("y", 17)
+          .attr("text-anchor", "middle")
+          .text("My favorite movies");
+
+        nv.utils.windowResize(chart.update);
+        return chart;
+    });
+
+
+</script>
